@@ -199,7 +199,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Total Produk Terjual</p>
-                            <p class="text-4xl font-bold text-gray-900 mt-2">50</p>
+                            <p class="text-4xl font-bold text-gray-900 mt-2">{{ $totalTerjual }}</p>
                         </div>
                         <div class="w-11 h-11 bg-green-50 rounded-xl flex items-center justify-center">
                             <svg class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -214,7 +214,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-sm font-medium text-[#a855f7]">Total Profit</p>
-                            <p class="text-3xl font-bold text-gray-900 mt-2">Rp 350.000</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-2">Rp {{ number_format($totalProfit, 0, ',', '.') }}</p>
                         </div>
                         <div class="w-11 h-11 bg-purple-50 rounded-xl flex items-center justify-center">
                             <svg class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -229,7 +229,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
                 <div class="profit-card" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
                     <p class="text-sm font-medium text-blue-100 mb-1">$ Total Modal</p>
-                    <p class="text-3xl font-bold">Rp 450.000</p>
+                    <p class="text-3xl font-bold">Rp {{ number_format($totalModal, 0, ',', '.') }}</p>
                 </div>
                 <div class="profit-card" style="background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);">
                     <p class="text-sm font-medium text-green-100 mb-1 flex items-center gap-1">
@@ -238,7 +238,7 @@
                         </svg>
                         Total Pendapatan
                     </p>
-                    <p class="text-3xl font-bold">Rp 800.000</p>
+                    <p class="text-3xl font-bold">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
                 </div>
                 <div class="profit-card" style="background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);">
                     <p class="text-sm font-medium text-purple-100 mb-1 flex items-center gap-1">
@@ -247,8 +247,8 @@
                         </svg>
                         Total Profit
                     </p>
-                    <p class="text-3xl font-bold">Rp 350.000</p>
-                    <p class="text-sm text-purple-200 mt-1">(77.8%)</p>
+                    <p class="text-3xl font-bold">Rp {{ number_format($totalProfit, 0, ',', '.') }}</p>
+                    <p class="text-sm text-purple-200 mt-1">({{ $totalModal > 0 ? round(($totalProfit / $totalModal) * 100, 1) : 0 }}%)</p>
                 </div>
             </div>
 
@@ -276,19 +276,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
-                            @php
-                            $products = [
-                                ['name'=>'Vintage Denim Jacket','brand'=>"Levi's",'modal'=>150000,'jual'=>250000,'terjual'=>5],
-                                ['name'=>'Oversized Hoodie','brand'=>'Uniqlo','modal'=>200000,'jual'=>350000,'terjual'=>8],
-                                ['name'=>'Cargo Pants','brand'=>'Dickies','modal'=>120000,'jual'=>200000,'terjual'=>6],
-                                ['name'=>'Floral Dress','brand'=>'Zara','modal'=>180000,'jual'=>300000,'terjual'=>3],
-                                ['name'=>'Classic White Tee','brand'=>'H&M','modal'=>50000,'jual'=>100000,'terjual'=>15],
-                                ['name'=>'Leather Bomber Jacket','brand'=>'Zara','modal'=>300000,'jual'=>500000,'terjual'=>2],
-                                ['name'=>'Striped Polo Shirt','brand'=>'Ralph Lauren','modal'=>80000,'jual'=>150000,'terjual'=>4],
-                                ['name'=>'Knit Sweater','brand'=>'Uniqlo','modal'=>150000,'jual'=>250000,'terjual'=>7],
-                                ['name'=>'PINK DRESS','brand'=>'Zara','modal'=>100000,'jual'=>100000,'terjual'=>0],
-                            ];
-                            @endphp
+
                             @foreach($products as $p)
                             @php
                                 $laba = $p['jual'] - $p['modal'];
@@ -329,18 +317,8 @@
                     Aktivitas Terbaru
                 </h2>
                 <div class="space-y-1">
-                    @php
-                    $activities = [
-                        ['desc'=>'PINK DRESS ditambahkan ke inventory','date'=>'18 Desember 2025','type'=>'add'],
-                        ['desc'=>'Stok Oversized Hoodie ditambahkan (+3 pcs)','date'=>'18 Desember 2025','type'=>'add'],
-                        ['desc'=>'Oversized Hoodie terjual (1 pcs)','date'=>'13 Desember 2025','type'=>'sell'],
-                        ['desc'=>'Knit Sweater ditambahkan ke inventory','date'=>'13 Desember 2025','type'=>'add'],
-                        ['desc'=>'Classic White Tee terjual (2 pcs)','date'=>'12 Desember 2025','type'=>'sell'],
-                        ['desc'=>'Leather Bomber Jacket terjual (1 pcs)','date'=>'10 Desember 2025','type'=>'sell'],
-                        ['desc'=>'Striped Polo Shirt ditambahkan ke inventory','date'=>'9 Desember 2025','type'=>'add'],
-                    ];
-                    @endphp
-                    @foreach($activities as $act)
+
+                    @foreach($aktivitas as $act)
                     <div class="flex items-start gap-4 py-3 border-b border-gray-50 last:border-0">
                         <div class="mt-1.5 w-2.5 h-2.5 rounded-full flex-shrink-0 {{ $act['type']==='add' ? 'bg-blue-400' : 'bg-green-400' }}"></div>
                         <div>
@@ -512,15 +490,16 @@
                             </button>
                         </div>
                         <div class="px-8 py-6 max-h-[70vh] overflow-y-auto scrollbar-thin">
-                            <form @submit.prevent="saveProduct" class="space-y-4 w-full text-left">
+                            <form :action="isEditing ? '/admin/produk/' + products[editIndex].id + '/update' : '/admin/produk'" method="POST" class="space-y-4 w-full text-left">
+                                @csrf
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 mb-1">Nama Produk</label>
-                                    <input type="text" x-model="newProduct.name" required class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
+                                    <input type="text" name="nama" x-model="newProduct.name" required class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
                                 </div>
                                 <div class="grid grid-cols-2 gap-5">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-500 mb-1">Kategori</label>
-                                        <select x-model="newProduct.cat" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200 bg-white">
+                                        <select name="kategori" x-model="newProduct.cat" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200 bg-white">
                                             <option>Baju</option>
                                             <option>outer</option>
                                             <option>hoodie</option>
@@ -530,7 +509,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-500 mb-1">Ukuran</label>
-                                        <select x-model="newProduct.size" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200 bg-white">
+                                        <select name="ukuran" x-model="newProduct.size" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200 bg-white">
                                             <option>S</option>
                                             <option>M</option>
                                             <option>L</option>
@@ -541,43 +520,43 @@
                                 <div class="grid grid-cols-2 gap-5">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-500 mb-1">Kondisi</label>
-                                        <select x-model="newProduct.cond" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200 bg-white">
+                                        <select name="kondisi" x-model="newProduct.cond" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200 bg-white">
                                             <option>new</option>
                                             <option>second</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-500 mb-1">Brand</label>
-                                        <input type="text" x-model="newProduct.brand" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
+                                        <input type="text" name="brand" x-model="newProduct.brand" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-5">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-500 mb-1">Warna</label>
                                         <div class="flex items-center gap-2">
-                                            <input type="color" x-model="newProduct.color" class="h-[46px] w-[50px] p-1 border border-gray-200 rounded-lg bg-white cursor-pointer" title="Pilih warna">
-                                            <input type="text" x-model="newProduct.color" placeholder="#000000" class="flex-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
+                                            <input type="color" name="warna_hex" x-model="newProduct.color" class="h-[46px] w-[50px] p-1 border border-gray-200 rounded-lg bg-white cursor-pointer" title="Pilih warna">
+                                            <input type="text" name="warna" x-model="newProduct.color" placeholder="#000000" class="flex-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
                                         </div>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-500 mb-1">Harga Modal (Rp)</label>
-                                        <input type="number" x-model="newProduct.modal" min="0" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
+                                        <input type="number" name="harga_modal" x-model="newProduct.modal" min="0" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-5">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-500 mb-1">Harga Jual (Rp)</label>
-                                        <input type="number" x-model="newProduct.jual" min="0" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
+                                        <input type="number" name="harga" x-model="newProduct.jual" min="0" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
                                     </div>
-                                    <div>
+                                    <div x-show="!isEditing">
                                         <label class="block text-sm font-medium text-gray-500 mb-1">Kuantitas</label>
-                                        <input type="number" x-model="newProduct.stock" min="0" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
+                                        <input type="number" name="stok" x-model="newProduct.stock" min="0" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
                                     </div>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-500 mb-1">Lokasi Penyimpanan</label>
                                     <div class="grid grid-cols-2 gap-5">
-                                        <input type="text" x-model="newProduct.loc" placeholder="Box A - Rak 1" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
+                                        <input type="text" name="lokasi" x-model="newProduct.loc" placeholder="Box A - Rak 1" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
                                     </div>
                                 </div>
                         </div>
@@ -611,19 +590,20 @@
                         Input Stok Masuk
                     </h3>
                     
-                    <form @submit.prevent="addStockEntry" class="space-y-4">
+                    <form method="POST" action="/admin/stok-masuk" class="space-y-4">
+                        @csrf
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Pilih Produk</label>
-                            <select x-model="stockForm.productId" required class="w-full border border-purple-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-purple-200 bg-white shadow-sm">
+                            <select name="id_produk" x-model="stockForm.productId" required class="w-full border border-purple-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-purple-200 bg-white shadow-sm">
                                 <option value="">-- Pilih Produk --</option>
                                 <template x-for="(p, index) in products" :key="index">
-                                    <option :value="index" x-text="p.name"></option>
+                                    <option :value="p.id" x-text="p.name"></option>
                                 </template>
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Jumlah Stok Masuk</label>
-                            <input type="number" x-model.number="stockForm.qty" min="1" required class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
+                            <input type="number" name="kuantitas" x-model.number="stockForm.qty" min="1" required class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Lokasi Penyimpanan</label>
@@ -701,23 +681,24 @@
                         Input Stok Keluar
                     </h3>
                     
-                    <form @submit.prevent="addStockOutEntry" class="space-y-4">
+                    <form method="POST" action="/admin/stok-keluar" class="space-y-4">
+                        @csrf
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Pilih Produk</label>
-                            <select x-model="stockOutForm.productId" required class="w-full border border-red-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-red-200 bg-white shadow-sm">
+                            <select name="id_produk" x-model="stockOutForm.productId" required class="w-full border border-red-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-red-200 bg-white shadow-sm">
                                 <option value="">-- Pilih Produk --</option>
                                 <template x-for="(p, index) in products" :key="index">
-                                    <option :value="index" x-text="p.name + ' (Sisa: ' + p.stock + ')'"></option>
+                                    <option :value="p.id" x-text="p.name + ' (Sisa: ' + p.stock + ')'"></option>
                                 </template>
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Jumlah Stok Keluar</label>
-                            <input type="number" x-model.number="stockOutForm.qty" min="1" required class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200">
+                            <input type="number" name="kuantitas" x-model.number="stockOutForm.qty" min="1" required class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Alasan Keluar</label>
-                            <select x-model="stockOutForm.reason" required class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200 bg-white">
+                            <select name="alasan" x-model="stockOutForm.reason" required class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200 bg-white">
                                 <option value="Terjual">Terjual</option>
                                 <option value="Rusak">Rusak / Cacat</option>
                                 <option value="Hilang">Hilang</option>
@@ -1053,18 +1034,13 @@ document.addEventListener('alpine:init', () => {
     const tableDateStr = n.getDate() + ' ' + actMonths[n.getMonth()].substring(0,3) + ' ' + n.getFullYear() + ' ' + todayTimeStr;
 
     Alpine.data('adminApp', () => ({
-        page: 'dashboard',
+        page: new URLSearchParams(window.location.search).get('page') || 'dashboard',
         sidebarOpen: true,
         showAddModal: false,
         isEditing: false,
         editIndex: null,
         newProduct: { name: '', cat: 'Baju', size: 'M', cond: 'new', brand: '', color: '', modal: 0, jual: 0, stock: 0, loc: '' },
-        products: [
-            {name:'Vintage Denim Jacket',cat:'outer',size:'M',cond:'second',brand:'Levi\'s',color:'Blue',colorHex:'bg-blue-600',modal:150000,jual:250000,stock:3,loc:'Box A - Rak 1'},
-            {name:'Oversized Hoodie',cat:'hoodie',size:'L',cond:'new',brand:'Uniqlo',color:'Black',colorHex:'bg-black',modal:200000,jual:350000,stock:8,loc:'Box B - Rak 2'},
-            {name:'Cargo Pants',cat:'celana',size:'L',cond:'second',brand:'Dickies',color:'Khaki',colorHex:'bg-[#f5e6a2]',modal:120000,jual:200000,stock:4,loc:'Box A - Rak 3'},
-            {name:'Floral Dress',cat:'dress',size:'M',cond:'new',brand:'Zara',color:'Pink',colorHex:'bg-pink-300',modal:180000,jual:300000,stock:2,loc:'Box C - Rak 1'}
-        ],
+        products: @json($products ?? []),
         formatCurrency(val) {
             return 'Rp<br>' + new Intl.NumberFormat('id-ID').format(val);
         },
@@ -1121,9 +1097,7 @@ document.addEventListener('alpine:init', () => {
         
         // --- Logic Stok Masuk ---
         stockForm: { productId: '', qty: 0, loc: '', note: '' },
-        stockLogs: [
-            { date: tableDateStr, productName: 'Vintage Denim Jacket', qty: 5, loc: 'Box A - Rak 1', note: 'Restock dari supplier utama' }
-        ],
+        stockLogs: @json($stokMasuk ?? []),
         addStockEntry() {
             if (this.stockForm.productId === '' || !this.stockForm.qty) return;
             
@@ -1166,9 +1140,7 @@ document.addEventListener('alpine:init', () => {
         
         // --- Logic Stok Keluar ---
         stockOutForm: { productId: '', qty: 0, reason: 'Terjual', note: '' },
-        stockOutLogs: [
-            { date: tableDateStr, productName: 'Cargo Pants', qty: 1, reason: 'Terjual', note: 'Order #INV-2023' }
-        ],
+        stockOutLogs: @json($stokKeluar ?? []),
         addStockOutEntry() {
             if (this.stockOutForm.productId === '' || !this.stockOutForm.qty) return;
             

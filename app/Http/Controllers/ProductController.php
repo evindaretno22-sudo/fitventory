@@ -2,80 +2,92 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Models\Produk;
+use App\Models\Stock;
+use App\Models\Aktivitas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
-    public function index()
-{
-    $products = Product::all();
-    return view('produk', compact('products'));
-}
-
-public function create()
-{
-    return view('tambah_produk');
-}
-
-public function store(Request $request)
-{
-    $request->validate([
-        'nama' => 'required',
-        'harga' => 'required',
-        'stok' => 'required',
-        'deskripsi' => 'required',
-    ]);
-
-    $gambarPath = null;
-
-    if ($request->hasFile('gambar')) {
-        $gambarPath = $request->file('gambar')->store('produk', 'public');
+    private function logAktivitas($tipe, $deskripsi)
+    {
+        Aktivitas::create([
+            'tipe' => $tipe,
+            'tanggal' => now(),
+            'deskripsi' => $deskripsi,
+            'id_user' => Auth::id() ?? 1
+        ]);
     }
 
-    Product::create([
-        'nama' => $request->nama,
-        'deskripsi' => $request->deskripsi,
-        'harga' => $request->harga,
-        'stok' => $request->stok,
-        'gambar' => $gambarPath
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required',
+            'harga' => 'required|numeric',
+            'kategori' => 'required',
+            'ukuran' => 'required',
+            'kondisi' => 'required',
+            // Tambahkan validasi lain sesuai kebutuhan
+        ]);
 
-    return redirect('/produk');
-}
+        $produk = Produk::create([
+            'kategori' => $request->kategori,
+            'ukuran' => $request->ukuran,
+            'kondisi' => $request->kondisi,
+            'brand' => $request->brand ?? '-',
+            'warna' => $request->warna ?? '#000000',
+            'nama' => $request->nama,
+            'harga' => $request->harga,
+            'lokasi' => $request->lokasi ?? '-'
+        ]);
 
-public function edit($id)
-{
-    $product = Product::findOrFail($id);
-    return view('edit_produk', compact('product'));
-}
+        if ($request->has('stok') && $request->stok > 0) {
+            Stock::create([
+                'id_produk' => $produk->id,
+                'kuantitas' => $request->stok,
+                'harga' => $request->harga_modal ?? 0
+            ]);
+        }
 
-public function update(Request $request, $id)
-{
-    $product = Product::findOrFail($id);
+        $this->logAktivitas('tambah', "{$produk->nama} ditambahkan ke inventory.");
 
-    $gambarPath = $product->gambar;
-
-    if ($request->hasFile('gambar')) {
-        $gambarPath = $request->file('gambar')->store('produk', 'public');
+        return redirect('/admin/dashboard?page=produk')->with('success', 'Produk berhasil ditambahkan');
     }
 
-    $product->update([
-        'nama' => $request->nama,
-        'deskripsi' => $request->deskripsi,
-        'harga' => $request->harga,
-        'stok' => $request->stok,
-        'gambar' => $gambarPath
-    ]);
+    public function update(Request $request, $id)
+    {
+        $produk = Produk::findOrFail($id);
+        $oldHarga = $produk->harga;
 
-    return redirect('/produk');
-}
+        $produk->update([
+            'kategori' => $request->kategori ?? $produk->kategori,
+            'ukuran' => $request->ukuran ?? $produk->ukuran,
+            'kondisi' => $request->kondisi ?? $produk->kondisi,
+            'brand' => $request->brand ?? $produk->brand,
+            'warna' => $request->warna ?? $produk->warna,
+            'nama' => $request->nama ?? $produk->nama,
+            'harga' => $request->harga ?? $produk->harga,
+            'lokasi' => $request->lokasi ?? $produk->lokasi
+        ]);
 
-public function destroy($id)
-{
-    $product = Product::findOrFail($id);
-    $product->delete();
+        $this->logAktivitas('edit', "Produk {$produk->nama} diperbarui.");
 
-    return redirect('/produk');
-}
+        if ($oldHarga != $produk->harga) {
+            $this->logAktivitas('harga_diubah', "Harga {$produk->nama} diubah dari Rp{$oldHarga} ke Rp{$produk->harga}.");
+        }
+
+        return redirect('/admin/dashboard?page=produk')->with('success', 'Produk berhasil diperbarui');
+    }
+
+    public function destroy($id)
+    {
+        $produk = Produk::findOrFail($id);
+        $nama = $produk->nama;
+        $produk->delete();
+
+        $this->logAktivitas('edit', "Produk {$nama} dihapus dari inventory.");
+
+        return redirect('/admin/dashboard?page=produk')->with('success', 'Produk berhasil dihapus');
+    }
 }

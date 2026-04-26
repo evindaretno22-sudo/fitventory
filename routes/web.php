@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -32,29 +35,32 @@ Route::get('/pesanan', function () {
     return view('pelanggan.pesanan');
 });
 
-// Admin Routes
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-});
-
-// Alias for safety
-Route::get('/dashboard', function () {
-    return view('admin.dashboard');
-});
-
 // Auth Routes
 Route::get('/login', function () {
     return view('auth.index');
 })->name('login');
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/register', function () {
     return view('auth.index');
 })->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/logout', [AuthController::class, 'logout']); // Fallback
 
-// Product Routes (Based on existing ProductController)
-Route::get('/produk', [ProductController::class, 'index']);
-Route::get('/tambah-produk', [ProductController::class, 'create']);
-Route::post('/tambah-produk', [ProductController::class, 'store']);
-Route::get('/edit-produk/{id}', [ProductController::class, 'edit']);
-Route::post('/update-produk/{id}', [ProductController::class, 'update']);
-Route::delete('/hapus-produk/{id}', [ProductController::class, 'destroy']);
+// Admin Routes (Harusnya pakai route group auth & middleware admin, tapi kita sementara buat terbuka atau auth dasar)
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+    
+    Route::post('/produk', [ProductController::class, 'store']);
+    Route::post('/produk/{id}/update', [ProductController::class, 'update']);
+    Route::post('/produk/{id}/delete', [ProductController::class, 'destroy']);
+    
+    Route::post('/stok-masuk', [StockController::class, 'storeIn']);
+    Route::post('/stok-keluar', [StockController::class, 'storeOut']);
+});
+
+// Alias for safety
+Route::get('/dashboard', function () {
+    return redirect('/admin/dashboard');
+});

@@ -27,7 +27,7 @@
 <body class="bg-gradient-primary min-h-screen flex items-center justify-center p-4">
 
     <!-- Auth Card -->
-    <div x-data="{ tab: 'login', role: 'pelanggan' }" class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <div x-data="{ tab: '{{ old('name') || $errors->has('name') ? 'register' : 'login' }}', role: '{{ old('role', 'pelanggan') }}' }" class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
         
         <!-- Header Section -->
         <div class="bg-gradient-header py-10 px-6 text-center text-white">
@@ -59,34 +59,24 @@
             </div>
 
             <!-- Login Form -->
-            <form x-show="tab === 'login'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0" :action="role === 'admin' ? '/dashboard' : '/katalog'" method="GET" class="space-y-5">
+            <form x-show="tab === 'login'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0" action="/login" method="POST" class="space-y-5">
+                @csrf
                 
+                <!-- Display Errors -->
+                @if($errors->any() && !$errors->has('name'))
+                    <div class="bg-red-50 text-red-500 p-3 rounded-lg text-sm">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" placeholder="email@example.com" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] outline-none transition-all" required>
+                    <input type="email" name="email" value="{{ old('email') }}" placeholder="email@example.com" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] outline-none transition-all" required>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] outline-none transition-all" required>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Daftar Sebagai</label>
-                    <div class="flex gap-4">
-                        <button type="button" @click="role = 'admin'" :class="role === 'admin' ? 'border-[#a855f7] text-[#a855f7] ring-1 ring-[#a855f7]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'" class="flex-1 py-2.5 border rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                            </svg>
-                            Admin
-                        </button>
-                        <button type="button" @click="role = 'pelanggan'" :class="role === 'pelanggan' ? 'border-[#a855f7] text-[#a855f7] ring-1 ring-[#a855f7]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'" class="flex-1 py-2.5 border rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" />
-                            </svg>
-                            Pelanggan
-                        </button>
-                    </div>
+                    <input type="password" name="password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] outline-none transition-all" required>
                 </div>
 
                 <div class="pt-2">
@@ -97,7 +87,7 @@
                 
                 <!-- Demo Accounts Info -->
                 <div class="mt-6 bg-gray-50 rounded-xl p-4 text-xs text-gray-500 flex flex-col items-center">
-                    <span class="font-semibold text-gray-600 mb-2">Demo Accounts:</span>
+                    <span class="font-semibold text-gray-600 mb-2">Demo Accounts (Tergantung Database):</span>
                     <div class="flex items-center gap-2 mb-1">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>
                         Admin: admin@fitventory.com
@@ -110,26 +100,35 @@
             </form>
 
             <!-- Register Form -->
-            <form x-show="tab === 'register'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0" style="display: none;" action="/katalog" method="GET" class="space-y-5">
+            <form x-show="tab === 'register'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0" style="display: none;" action="/register" method="POST" class="space-y-5">
+                @csrf
+
+                <!-- Display Errors form Register -->
+                @if($errors->any() && $errors->has('name'))
+                    <div class="bg-red-50 text-red-500 p-3 rounded-lg text-sm">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                    <input type="text" placeholder="John Doe" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] outline-none transition-all" required>
+                    <input type="text" name="name" value="{{ old('name') }}" placeholder="John Doe" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] outline-none transition-all" required>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" placeholder="email@example.com" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] outline-none transition-all" required>
+                    <input type="email" name="email" value="{{ old('email') }}" placeholder="email@example.com" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] outline-none transition-all" required>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] outline-none transition-all" required>
+                    <input type="password" name="password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] outline-none transition-all" required>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Daftar Sebagai</label>
                     <div class="flex gap-4">
+                        <input type="hidden" name="role" :value="role">
                         <button type="button" @click="role = 'admin'" :class="role === 'admin' ? 'border-[#a855f7] text-[#a855f7] ring-1 ring-[#a855f7]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'" class="flex-1 py-2.5 border rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                               <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />

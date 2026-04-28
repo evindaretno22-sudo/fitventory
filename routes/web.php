@@ -60,6 +60,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('/stok-keluar', [StockController::class, 'storeOut']);
 });
 
+// UI Integration Routes
+Route::get('/produk', [ProductController::class, 'indexUi']);
+Route::get('/tambah-produk', [ProductController::class, 'createUi']);
+Route::post('/tambah-produk', [ProductController::class, 'storeUi']);
+Route::get('/edit-produk/{id}', [ProductController::class, 'editUi']);
+Route::post('/update-produk/{id}', [ProductController::class, 'updateUi']);
+Route::delete('/hapus-produk/{id}', [ProductController::class, 'destroyUi']);
+
 // Alias for safety
 Route::get('/dashboard', function () {
     return redirect('/admin/dashboard');

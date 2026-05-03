@@ -40,10 +40,17 @@ class StockController extends Controller
             'id_stok' => $stock->id,
             'tipe' => 'in',
             'kuantitas' => $request->kuantitas,
+            'catatan' => $request->catatan,
         ]);
 
         $produk = Produk::find($request->id_produk);
-        $this->logAktivitas('tambah', "Stok {$produk->nama} ditambahkan (+{$request->kuantitas} pcs).");
+        if ($request->filled('lokasi')) {
+            $produk->lokasi = $request->lokasi;
+            $produk->save();
+        }
+        
+        $catatanText = $request->filled('catatan') ? " Catatan: {$request->catatan}" : "";
+        $this->logAktivitas('tambah', "Stok {$produk->nama} ditambahkan (+{$request->kuantitas} pcs).{$catatanText}");
 
         return redirect('/admin/dashboard?page=stokmasuk')->with('success', 'Stok berhasil ditambahkan');
     }
@@ -69,13 +76,16 @@ class StockController extends Controller
             'id_stok' => $stock->id,
             'tipe' => 'out',
             'kuantitas' => $request->kuantitas,
+            'alasan' => $request->alasan,
+            'catatan' => $request->catatan,
         ]);
 
         $produk = Produk::find($request->id_produk);
-        $alasanText = $request->alasan === 'Terjual' ? 'terjual' : 'dikeluarkan';
+        $alasanText = $request->alasan === 'Terjual' ? 'terjual' : 'dikeluarkan karena ' . strtolower($request->alasan);
         $logTipe = $request->alasan === 'Terjual' ? 'terjual' : 'edit';
+        $catatanText = $request->filled('catatan') ? " Catatan: {$request->catatan}" : "";
         
-        $this->logAktivitas($logTipe, "{$produk->nama} {$alasanText} ({$request->kuantitas} pcs).");
+        $this->logAktivitas($logTipe, "{$produk->nama} {$alasanText} ({$request->kuantitas} pcs).{$catatanText}");
 
         return redirect('/admin/dashboard?page=stokkeluar')->with('success', 'Stok berhasil dikeluarkan');
     }

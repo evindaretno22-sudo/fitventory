@@ -64,6 +64,34 @@
 
 <div class="flex min-h-screen">
 
+    @if (session('success'))
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition.opacity.duration.500ms class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] bg-white border border-green-200 text-green-700 px-5 py-2.5 rounded-full shadow-lg shadow-green-500/10 flex items-center gap-3 text-sm min-w-max justify-between" role="alert">
+        <div class="flex items-center gap-2.5">
+            <div class="bg-green-100 rounded-full p-1">
+                <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <span class="font-semibold whitespace-nowrap pr-2">{{ session('success') }}</span>
+        </div>
+        <button @click="show = false" class="text-gray-400 hover:text-gray-600 transition focus:outline-none flex-shrink-0">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    @endif
+
+    @if (session('error'))
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition.opacity.duration.500ms class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] bg-white border border-red-200 text-red-700 px-5 py-2.5 rounded-full shadow-lg shadow-red-500/10 flex items-center gap-3 text-sm min-w-max justify-between" role="alert">
+        <div class="flex items-center gap-2.5">
+            <div class="bg-red-100 rounded-full p-1">
+                <svg class="w-4 h-4 text-red-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="font-semibold whitespace-nowrap pr-2">{{ session('error') }}</span>
+        </div>
+        <button @click="show = false" class="text-gray-400 hover:text-gray-600 transition focus:outline-none flex-shrink-0">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    @endif
+
     <!-- ===== SIDEBAR ===== -->
     <aside class="w-56 bg-white border-r border-gray-100 flex flex-col py-6 px-3 fixed h-full z-30 shadow-sm" style="min-height:100vh">
 
@@ -138,7 +166,7 @@
                 <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                Kelola Customer
+                Kelola Pesanan
             </a>
 
             <a @click="page = 'pengaturan'" :class="page === 'pengaturan' ? 'active' : ''" class="sidebar-link" id="nav-pengaturan">
@@ -607,12 +635,12 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Lokasi Penyimpanan</label>
-                            <input type="text" x-model="stockForm.loc" placeholder="Box A, Rak 2, dll" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
+                            <input type="text" name="lokasi" x-model="stockForm.loc" placeholder="Box A, Rak 2, dll" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200">
                             <p class="text-xs text-gray-400 mt-1">Opsional - kosongkan untuk menggunakan lokasi default produk</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Catatan</label>
-                            <textarea x-model="stockForm.note" placeholder="Catatan tambahan..." rows="3" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200"></textarea>
+                            <textarea name="catatan" x-model="stockForm.note" placeholder="Catatan tambahan..." rows="3" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200"></textarea>
                         </div>
                         
                         <button type="submit" class="w-full bg-gradient-to-r from-[#8b5cf6] to-[#3b82f6] text-white py-3 rounded-lg font-medium hover:opacity-90 transition shadow-sm mt-4 flex items-center justify-center gap-2">
@@ -707,7 +735,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Catatan</label>
-                            <textarea x-model="stockOutForm.note" placeholder="Catatan tambahan (Misal: Terjual di Shopee)..." rows="3" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200"></textarea>
+                            <textarea name="catatan" x-model="stockOutForm.note" placeholder="Catatan tambahan (Misal: Terjual di Shopee)..." rows="3" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200"></textarea>
                         </div>
                         
                         <button type="submit" class="w-full bg-gradient-to-r from-[#ef4444] to-[#f97316] text-white py-3 rounded-lg font-medium hover:opacity-90 transition shadow-sm mt-4 flex items-center justify-center gap-2">
@@ -994,14 +1022,68 @@
         </div>
 
         <div x-show="page === 'customer'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="p-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Kelola Customer</h1>
-            <p class="text-gray-500 mb-6">Data dan manajemen pelanggan</p>
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center text-gray-400">
-                <svg class="h-14 w-14 mx-auto mb-4 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                <p class="font-medium">Halaman Kelola Customer</p>
-                <p class="text-sm mt-1">Konten akan ditampilkan di sini</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Pesanan Customer</h1>
+            <p class="text-gray-500 mb-6">Kelola dan update status pesanan</p>
+            
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto scrollbar-thin">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-50 text-gray-500 font-bold text-[11px] uppercase tracking-wider border-b border-gray-100">
+                            <tr>
+                                <th class="px-5 py-4">Order ID</th>
+                                <th class="px-5 py-4">Customer</th>
+                                <th class="px-5 py-4 text-center">Items</th>
+                                <th class="px-5 py-4">Total</th>
+                                <th class="px-5 py-4 text-center">Pembayaran</th>
+                                <th class="px-5 py-4 text-center">Status</th>
+                                <th class="px-5 py-4 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <template x-for="order in customerOrders" :key="order.id">
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-5 py-4 font-bold text-gray-800" x-text="order.order_id"></td>
+                                    <td class="px-5 py-4">
+                                        <div class="font-medium text-gray-800" x-text="order.customer"></div>
+                                        <div class="text-xs text-gray-500 mt-0.5" x-text="order.phone"></div>
+                                    </td>
+                                    <td class="px-5 py-4 text-center text-gray-600" x-text="order.items_count + ' item(s)'"></td>
+                                    <td class="px-5 py-4 font-medium text-gray-800" x-text="formatCurrency(order.total).replace('<br>',' ')"></td>
+                                    <td class="px-5 py-4 text-center">
+                                        <span class="px-2.5 py-1 text-[11px] font-bold rounded text-blue-700 bg-blue-100 lowercase" x-text="order.payment"></span>
+                                    </td>
+                                    <td class="px-5 py-4 text-center">
+                                        <span class="px-2.5 py-1 text-xs font-semibold rounded"
+                                            :class="{
+                                                'bg-yellow-100 text-yellow-700': order.status.toLowerCase() === 'pending',
+                                                'bg-blue-100 text-blue-700': order.status.toLowerCase() === 'dikemas',
+                                                'bg-purple-100 text-purple-700': order.status.toLowerCase() === 'dikirim',
+                                                'bg-green-100 text-green-700': order.status.toLowerCase() === 'selesai',
+                                                'bg-red-100 text-red-700': order.status.toLowerCase() === 'dibatalkan',
+                                                'bg-gray-100 text-gray-700': !['pending','dikemas','dikirim','selesai','dibatalkan'].includes(order.status.toLowerCase())
+                                            }" x-text="order.status.charAt(0).toUpperCase() + order.status.slice(1)">
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-4 text-center">
+                                        <form method="POST" :action="'/admin/pesanan/' + order.id + '/status'" class="inline-block">
+                                            @csrf
+                                            <select name="status_pesanan" onchange="this.form.submit()" class="border border-gray-200 rounded-lg text-sm px-3 py-1.5 focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer bg-white">
+                                                <option value="Pending" :selected="order.status.toLowerCase() === 'pending'">Pending</option>
+                                                <option value="Dikemas" :selected="order.status.toLowerCase() === 'dikemas'">Dikemas</option>
+                                                <option value="Dikirim" :selected="order.status.toLowerCase() === 'dikirim'">Dikirim</option>
+                                                <option value="Selesai" :selected="order.status.toLowerCase() === 'selesai'">Selesai</option>
+                                                <option value="Dibatalkan" :selected="order.status.toLowerCase() === 'dibatalkan'">Dibatalkan</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </template>
+                            <tr x-show="customerOrders.length === 0">
+                                <td colspan="7" class="px-5 py-10 text-center text-gray-400">Belum ada pesanan masuk.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -1246,23 +1328,18 @@ document.addEventListener('alpine:init', () => {
             }
         },
         
-        activitySummary: {
-            added: 1,
-            edited: 0,
-            sold: 0,
-            priceChanged: 0
-        },
-        activityGroups: [
-            {
-                date: todayDateStr,
-                items: [
-                    { type: "add", icon: "M12 4v16m8-8H4", color: "blue", label: "Ditambahkan", product: "PINK DRESS", desc: "PINK DRESS ditambahkan ke inventory", time: todayTimeStr }
-                ]
-            }
-        ],
+        activitySummary: {!! json_encode($activitySummary ?? ['added'=>0, 'edited'=>0, 'sold'=>0, 'priceChanged'=>0]) !!},
+        activityGroups: {!! json_encode($activityGroups ?? []) !!},
         
         // --- Logic Laporan Penjualan ---
-        salesLogs: [],
+        salesLogs: {!! json_encode($salesLogs ?? []) !!},
+        customerOrders: {!! json_encode($customerOrders ?? []) !!},
+        
+        init() {
+            setTimeout(() => {
+                this.updateBrandChart();
+            }, 300);
+        },
         
         get totalSoldItems() {
             return this.salesLogs.reduce((acc, sale) => acc + sale.qty, 0);

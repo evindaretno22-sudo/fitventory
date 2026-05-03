@@ -58,6 +58,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     
     Route::post('/stok-masuk', [StockController::class, 'storeIn']);
     Route::post('/stok-keluar', [StockController::class, 'storeOut']);
+    
+    Route::post('/pesanan/{id}/status', [\App\Http\Controllers\OrderController::class, 'updateStatus']);
 });
 
 // UI Integration Routes

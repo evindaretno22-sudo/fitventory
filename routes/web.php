@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SettingsController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -16,7 +17,8 @@ Route::get('/katalog', function () {
 });
 
 Route::get('/info-toko', function () {
-    return view('pelanggan.info-toko');
+    $settings = \App\Models\StoreSetting::getAllSettings();
+    return view('pelanggan.info-toko', compact('settings'));
 });
 
 Route::get('/keranjang', function () {
@@ -31,9 +33,8 @@ Route::get('/pembayaran', function () {
     return view('pelanggan.pembayaran');
 });
 
-Route::get('/pesanan', function () {
-    return view('pelanggan.pesanan');
-});
+Route::get('/pesanan', [\App\Http\Controllers\OrderController::class, 'myOrders']);
+Route::post('/order', [\App\Http\Controllers\OrderController::class, 'store']);
 
 // Auth Routes
 Route::get('/login', function () {
@@ -60,6 +61,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('/stok-keluar', [StockController::class, 'storeOut']);
     
     Route::post('/pesanan/{id}/status', [\App\Http\Controllers\OrderController::class, 'updateStatus']);
+    Route::post('/pengaturan', [SettingsController::class, 'update'])->name('admin.settings.update');
 });
 
 // UI Integration Routes

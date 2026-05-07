@@ -87,7 +87,7 @@
             
             <!-- Left Card: Contact List -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                <h2 class="text-2xl font-semibold text-gray-900 mb-8">Fitventory Thrift Store</h2>
+                <h2 class="text-2xl font-semibold text-gray-900 mb-8">{{ $settings['nama_toko'] ?? 'Fitventory Thrift Store' }}</h2>
                 
                 <div class="space-y-8">
                     <!-- Alamat -->
@@ -100,8 +100,8 @@
                         </div>
                         <div class="flex-1">
                             <h3 class="text-sm text-gray-500 mb-1">Alamat</h3>
-                            <p class="text-gray-900 font-medium leading-relaxed mb-2">Jl. Pahlawan No. 456, Jakarta Pusat, DKI Jakarta 10110</p>
-                            <a href="#" class="text-purple-600 hover:text-purple-700 font-medium text-sm inline-flex items-center gap-1 transition">
+                            <p class="text-gray-900 font-medium leading-relaxed mb-2">{{ $settings['alamat'] ?? 'Jl. Pahlawan No. 456' }}</p>
+                            <a href="{{ $settings['maps_url'] ?? '#' }}" target="_blank" class="text-purple-600 hover:text-purple-700 font-medium text-sm inline-flex items-center gap-1 transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>
@@ -119,7 +119,7 @@
                         </div>
                         <div>
                             <h3 class="text-sm text-gray-500 mb-1">Telepon</h3>
-                            <p class="text-gray-900 font-medium text-lg">021-12345678</p>
+                            <p class="text-gray-900 font-medium text-lg">{{ $settings['telepon'] ?? '-' }}</p>
                         </div>
                     </div>
 
@@ -132,8 +132,8 @@
                         </div>
                         <div>
                             <h3 class="text-sm text-gray-500 mb-1">WhatsApp</h3>
-                            <p class="text-gray-900 font-medium text-lg mb-2">6281234567890</p>
-                            <a href="#" class="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-5 py-2.5 rounded-xl font-medium transition shadow-sm shadow-[#25D366]/30">
+                            <p class="text-gray-900 font-medium text-lg mb-2">{{ $settings['whatsapp'] ?? '-' }}</p>
+                            <a href="https://wa.me/{{ $settings['whatsapp'] ?? '' }}" target="_blank" class="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-5 py-2.5 rounded-xl font-medium transition shadow-sm shadow-[#25D366]/30">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                                 </svg>
@@ -153,7 +153,7 @@
                         </div>
                         <div>
                             <h3 class="text-sm text-gray-500 mb-1">Instagram</h3>
-                            <p class="text-gray-900 font-medium text-lg">@fitventory_thrift</p>
+                            <p class="text-gray-900 font-medium text-lg">{{ $settings['instagram'] ?? '-' }}</p>
                         </div>
                     </div>
 
@@ -167,7 +167,7 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Tentang Kami</h3>
                     <p class="text-gray-600 leading-relaxed">
-                        Toko thrift terpercaya dengan koleksi fashion berkualitas. Kami menyediakan berbagai macam pakaian branded second dan new dengan harga terjangkau.
+                        {{ $settings['deskripsi'] ?? 'Toko thrift terpercaya dengan koleksi fashion berkualitas.' }}
                     </p>
                 </div>
 
@@ -198,12 +198,12 @@
                     <div class="space-y-4">
                         <div class="flex justify-between items-center text-gray-600">
                             <span>Senin - Jumat</span>
-                            <span class="font-medium text-gray-900">09:00 - 21:00</span>
+                            <span class="font-medium text-gray-900">{{ $settings['jam_senin_jumat'] ?? '09:00 - 21:00' }}</span>
                         </div>
                         <hr class="border-gray-100">
                         <div class="flex justify-between items-center text-gray-600">
                             <span>Sabtu - Minggu</span>
-                            <span class="font-medium text-gray-900">10:00 - 22:00</span>
+                            <span class="font-medium text-gray-900">{{ $settings['jam_sabtu_minggu'] ?? '10:00 - 22:00' }}</span>
                         </div>
                     </div>
                 </div>
@@ -213,21 +213,21 @@
 
         <!-- Action Buttons Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <a href="#" class="bg-[#10b981] hover:bg-[#059669] text-white py-5 px-4 rounded-xl flex flex-col items-center justify-center gap-3 transition shadow-sm hover:shadow-md">
+            <a href="https://wa.me/{{ $settings['whatsapp'] ?? '' }}" target="_blank" class="bg-[#10b981] hover:bg-[#059669] text-white py-5 px-4 rounded-xl flex flex-col items-center justify-center gap-3 transition shadow-sm hover:shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
                 <span class="font-semibold">Chat WhatsApp</span>
             </a>
             
-            <a href="#" class="bg-[#3b82f6] hover:bg-[#2563eb] text-white py-5 px-4 rounded-xl flex flex-col items-center justify-center gap-3 transition shadow-sm hover:shadow-md">
+            <a href="tel:{{ $settings['telepon'] ?? '' }}" class="bg-[#3b82f6] hover:bg-[#2563eb] text-white py-5 px-4 rounded-xl flex flex-col items-center justify-center gap-3 transition shadow-sm hover:shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
                 <span class="font-semibold">Telepon</span>
             </a>
 
-            <a href="#" class="bg-[#db2777] hover:bg-[#be185d] text-white py-5 px-4 rounded-xl flex flex-col items-center justify-center gap-3 transition shadow-sm hover:shadow-md">
+            <a href="https://instagram.com/{{ ltrim($settings['instagram'] ?? '', '@') }}" target="_blank" class="bg-[#db2777] hover:bg-[#be185d] text-white py-5 px-4 rounded-xl flex flex-col items-center justify-center gap-3 transition shadow-sm hover:shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                   <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
@@ -236,7 +236,7 @@
                 <span class="font-semibold">Instagram</span>
             </a>
 
-            <a href="#" class="bg-[#a855f7] hover:bg-[#9333ea] text-white py-5 px-4 rounded-xl flex flex-col items-center justify-center gap-3 transition shadow-sm hover:shadow-md">
+            <a href="{{ $settings['maps_url'] ?? '#' }}" target="_blank" class="bg-[#a855f7] hover:bg-[#9333ea] text-white py-5 px-4 rounded-xl flex flex-col items-center justify-center gap-3 transition shadow-sm hover:shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />

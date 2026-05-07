@@ -165,10 +165,20 @@
 
                 </div>
 
-                <!-- Konfirmasi Pesanan Button -->
-                <a :href="`/pesanan?metode=` + selectedMethod" class="w-full bg-[#4f46e5] hover:opacity-90 transition-opacity text-white font-medium py-4 rounded-xl flex justify-center items-center gap-2 mt-6 shadow-sm">
-                    Konfirmasi Pesanan
-                </a>
+                <!-- Konfirmasi Pesanan Form -->
+                <form action="/order" method="POST">
+                    @csrf
+                    <input type="hidden" name="nama" value="{{ request('nama') }}">
+                    <input type="hidden" name="telepon" value="{{ request('telepon') }}">
+                    <input type="hidden" name="nomor_hp" value="{{ request('telepon') }}"> {{-- migration uses nomor_hp --}}
+                    <input type="hidden" name="alamat" value="{{ request('alamat') }}">
+                    <input type="hidden" name="metode_pembayaran" :value="selectedMethod">
+                    <input type="hidden" name="items" :value="JSON.stringify(items)">
+                    
+                    <button type="submit" class="w-full bg-[#4f46e5] hover:opacity-90 transition-opacity text-white font-medium py-4 rounded-xl flex justify-center items-center gap-2 mt-6 shadow-sm">
+                        Konfirmasi Pesanan
+                    </button>
+                </form>
 
             </div>
 

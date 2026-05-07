@@ -1021,56 +1021,162 @@
             </div>
         </div>
 
-        <div x-show="page === 'customer'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="p-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Pesanan Customer</h1>
-            <p class="text-gray-500 mb-6">Kelola dan update status pesanan</p>
-            
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div x-show="page === 'customer'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="p-4 sm:p-8"
+            x-data="{
+                orderSearch: '',
+                orderFilter: 'semua',
+                get filteredOrders() {
+                    return customerOrders.filter(o => {
+                        const matchStatus = this.orderFilter === 'semua' || o.status.toLowerCase() === this.orderFilter;
+                        const q = this.orderSearch.toLowerCase();
+                        const matchSearch = !q || o.order_id.toLowerCase().includes(q) || o.customer.toLowerCase().includes(q) || (o.phone && o.phone.includes(q));
+                        return matchStatus && matchSearch;
+                    });
+                },
+                get countPending() { return customerOrders.filter(o => o.status.toLowerCase() === 'pending').length; },
+                get countDikemas() { return customerOrders.filter(o => o.status.toLowerCase() === 'dikemas').length; },
+                get countDikirim() { return customerOrders.filter(o => o.status.toLowerCase() === 'dikirim' || o.status.toLowerCase() === 'pengiriman').length; },
+                get countSelesai() { return customerOrders.filter(o => o.status.toLowerCase() === 'selesai').length; },
+            }">
+
+            {{-- Header --}}
+            <div class="mb-6">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Pesanan Customer</h1>
+                <p class="text-gray-500 text-sm mt-1">Kelola dan update status pesanan</p>
+            </div>
+
+            {{-- Summary Cards --}}
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 cursor-pointer hover:border-yellow-300 transition" @click="orderFilter='pending'">
+                    <div class="w-9 h-9 rounded-lg bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 font-medium">Pending</p>
+                        <p class="text-xl font-bold text-gray-800" x-text="countPending"></p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 cursor-pointer hover:border-blue-300 transition" @click="orderFilter='dikemas'">
+                    <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 font-medium">Dikemas</p>
+                        <p class="text-xl font-bold text-gray-800" x-text="countDikemas"></p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 cursor-pointer hover:border-purple-300 transition" @click="orderFilter='dikirim'">
+                    <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 font-medium">Dikirim</p>
+                        <p class="text-xl font-bold text-gray-800" x-text="countDikirim"></p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 cursor-pointer hover:border-green-300 transition" @click="orderFilter='selesai'">
+                    <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 font-medium">Selesai</p>
+                        <p class="text-xl font-bold text-gray-800" x-text="countSelesai"></p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Filter & Search Bar --}}
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-4">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    {{-- Search --}}
+                    <div class="relative flex-1">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <input type="text" x-model="orderSearch" placeholder="Cari order ID, nama customer..." class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200 transition">
+                    </div>
+                    {{-- Status Filter --}}
+                    <div class="flex flex-wrap gap-2">
+                        <template x-for="f in [{val:'semua',label:'Semua'},{val:'pending',label:'Pending'},{val:'dikemas',label:'Dikemas'},{val:'dikirim',label:'Dikirim'},{val:'selesai',label:'Selesai'},{val:'dibatalkan',label:'Dibatalkan'}]" :key="f.val">
+                            <button @click="orderFilter=f.val"
+                                :class="orderFilter===f.val ? 'bg-gradient-to-r from-[#a855f7] to-[#3b82f6] text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                                class="px-3 py-1.5 text-xs font-semibold rounded-lg transition whitespace-nowrap"
+                                x-text="f.label">
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            {{-- DESKTOP TABLE (hidden on mobile) --}}
+            <div class="hidden sm:block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="overflow-x-auto scrollbar-thin">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-50 text-gray-500 font-bold text-[11px] uppercase tracking-wider border-b border-gray-100">
+                        <thead class="bg-gray-50 border-b border-gray-100">
                             <tr>
-                                <th class="px-5 py-4">Order ID</th>
-                                <th class="px-5 py-4">Customer</th>
-                                <th class="px-5 py-4 text-center">Items</th>
-                                <th class="px-5 py-4">Total</th>
-                                <th class="px-5 py-4 text-center">Pembayaran</th>
-                                <th class="px-5 py-4 text-center">Status</th>
-                                <th class="px-5 py-4 text-center">Aksi</th>
+                                <th class="px-5 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Order ID</th>
+                                <th class="px-5 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Customer</th>
+                                <th class="px-5 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Items</th>
+                                <th class="px-5 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total</th>
+                                <th class="px-5 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Pembayaran</th>
+                                <th class="px-5 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Status</th>
+                                <th class="px-5 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            <template x-for="order in customerOrders" :key="order.id">
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-5 py-4 font-bold text-gray-800" x-text="order.order_id"></td>
+                            <template x-for="order in filteredOrders" :key="order.id">
+                                <tr class="hover:bg-gray-50/80 transition-colors group">
                                     <td class="px-5 py-4">
-                                        <div class="font-medium text-gray-800" x-text="order.customer"></div>
-                                        <div class="text-xs text-gray-500 mt-0.5" x-text="order.phone"></div>
+                                        <span class="font-bold text-[#7c3aed]" x-text="order.order_id"></span>
                                     </td>
-                                    <td class="px-5 py-4 text-center text-gray-600" x-text="order.items_count + ' item(s)'"></td>
-                                    <td class="px-5 py-4 font-medium text-gray-800" x-text="formatCurrency(order.total).replace('<br>',' ')"></td>
-                                    <td class="px-5 py-4 text-center">
-                                        <span class="px-2.5 py-1 text-[11px] font-bold rounded text-blue-700 bg-blue-100 lowercase" x-text="order.payment"></span>
+                                    <td class="px-5 py-4">
+                                        <div class="font-semibold text-gray-800 leading-tight" x-text="order.customer"></div>
+                                        <div class="text-xs text-gray-400 mt-0.5" x-text="order.phone"></div>
                                     </td>
                                     <td class="px-5 py-4 text-center">
-                                        <span class="px-2.5 py-1 text-xs font-semibold rounded"
+                                        <span class="inline-block px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-semibold rounded" x-text="order.items_count + ' item(s)'"></span>
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <span class="font-semibold text-gray-800 whitespace-nowrap" x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(order.total)"></span>
+                                    </td>
+                                    <td class="px-5 py-4 text-center">
+                                        <span class="px-2.5 py-1 text-[11px] font-bold rounded-md lowercase whitespace-nowrap"
                                             :class="{
-                                                'bg-yellow-100 text-yellow-700': order.status.toLowerCase() === 'pending',
-                                                'bg-blue-100 text-blue-700': order.status.toLowerCase() === 'dikemas',
-                                                'bg-purple-100 text-purple-700': order.status.toLowerCase() === 'dikirim',
-                                                'bg-green-100 text-green-700': order.status.toLowerCase() === 'selesai',
-                                                'bg-red-100 text-red-700': order.status.toLowerCase() === 'dibatalkan',
-                                                'bg-gray-100 text-gray-700': !['pending','dikemas','dikirim','selesai','dibatalkan'].includes(order.status.toLowerCase())
-                                            }" x-text="order.status.charAt(0).toUpperCase() + order.status.slice(1)">
+                                                'bg-indigo-100 text-indigo-700': order.payment && order.payment.toLowerCase().includes('transfer'),
+                                                'bg-orange-100 text-orange-700': order.payment && order.payment.toLowerCase() === 'cod',
+                                                'bg-teal-100 text-teal-700': order.payment && order.payment.toLowerCase() === 'ewallet',
+                                                'bg-cyan-100 text-cyan-700': order.payment && order.payment.toLowerCase() === 'qris',
+                                                'bg-blue-100 text-blue-700': !order.payment || !['transfer','cod','ewallet','qris'].some(p => order.payment.toLowerCase().includes(p))
+                                            }"
+                                            x-text="order.payment || '-'">
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-4 text-center">
+                                        <span class="px-2.5 py-1.5 text-xs font-semibold rounded-md whitespace-nowrap"
+                                            :class="{
+                                                'bg-yellow-100 text-yellow-700 border border-yellow-200': order.status.toLowerCase() === 'pending',
+                                                'bg-blue-100 text-blue-700 border border-blue-200': order.status.toLowerCase() === 'dikemas',
+                                                'bg-purple-100 text-purple-700 border border-purple-200': ['dikirim','pengiriman'].includes(order.status.toLowerCase()),
+                                                'bg-green-100 text-green-700 border border-green-200': order.status.toLowerCase() === 'selesai',
+                                                'bg-red-100 text-red-700 border border-red-200': order.status.toLowerCase() === 'dibatalkan',
+                                                'bg-gray-100 text-gray-600 border border-gray-200': !['pending','dikemas','dikirim','pengiriman','selesai','dibatalkan'].includes(order.status.toLowerCase())
+                                            }"
+                                            x-text="order.status.charAt(0).toUpperCase() + order.status.slice(1)">
                                         </span>
                                     </td>
                                     <td class="px-5 py-4 text-center">
                                         <form method="POST" :action="'/admin/pesanan/' + order.id + '/status'" class="inline-block">
                                             @csrf
-                                            <select name="status_pesanan" onchange="this.form.submit()" class="border border-gray-200 rounded-lg text-sm px-3 py-1.5 focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer bg-white">
+                                            <select name="status_pesanan" onchange="this.form.submit()"
+                                                class="border border-gray-200 rounded-lg text-sm px-3 py-1.5 focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none cursor-pointer bg-white hover:border-purple-300 transition shadow-sm min-w-[110px]"
+                                                :class="{
+                                                    'border-yellow-300 text-yellow-700': order.status.toLowerCase() === 'pending',
+                                                    'border-blue-300 text-blue-700': order.status.toLowerCase() === 'dikemas',
+                                                    'border-purple-300 text-purple-700': ['dikirim','pengiriman'].includes(order.status.toLowerCase()),
+                                                    'border-green-300 text-green-700': order.status.toLowerCase() === 'selesai',
+                                                    'border-red-300 text-red-700': order.status.toLowerCase() === 'dibatalkan',
+                                                }">
                                                 <option value="Pending" :selected="order.status.toLowerCase() === 'pending'">Pending</option>
                                                 <option value="Dikemas" :selected="order.status.toLowerCase() === 'dikemas'">Dikemas</option>
-                                                <option value="Dikirim" :selected="order.status.toLowerCase() === 'dikirim'">Dikirim</option>
+                                                <option value="Pengiriman" :selected="['dikirim','pengiriman'].includes(order.status.toLowerCase())">Pengiriman</option>
                                                 <option value="Selesai" :selected="order.status.toLowerCase() === 'selesai'">Selesai</option>
                                                 <option value="Dibatalkan" :selected="order.status.toLowerCase() === 'dibatalkan'">Dibatalkan</option>
                                             </select>
@@ -1078,25 +1184,248 @@
                                     </td>
                                 </tr>
                             </template>
-                            <tr x-show="customerOrders.length === 0">
-                                <td colspan="7" class="px-5 py-10 text-center text-gray-400">Belum ada pesanan masuk.</td>
+                            <tr x-show="filteredOrders.length === 0">
+                                <td colspan="7" class="px-5 py-16 text-center">
+                                    <div class="flex flex-col items-center gap-2 text-gray-300">
+                                        <svg class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                        <span class="text-sm font-medium text-gray-400">Tidak ada pesanan ditemukan</span>
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                {{-- Footer --}}
+                <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                    <p class="text-xs text-gray-400">
+                        Menampilkan <span class="font-semibold text-gray-600" x-text="filteredOrders.length"></span> dari <span class="font-semibold text-gray-600" x-text="customerOrders.length"></span> pesanan
+                    </p>
+                    <button @click="orderFilter='semua'; orderSearch=''" x-show="orderFilter!=='semua' || orderSearch!==''" class="text-xs text-purple-600 hover:text-purple-800 font-medium transition">Reset Filter</button>
+                </div>
             </div>
+
+            {{-- MOBILE CARDS (shown only on mobile) --}}
+            <div class="sm:hidden space-y-3">
+                <template x-for="order in filteredOrders" :key="order.id">
+                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                        {{-- Top row: Order ID + Status badge --}}
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="font-bold text-[#7c3aed] text-sm" x-text="order.order_id"></span>
+                            <span class="px-2.5 py-1 text-xs font-semibold rounded-md whitespace-nowrap"
+                                :class="{
+                                    'bg-yellow-100 text-yellow-700': order.status.toLowerCase() === 'pending',
+                                    'bg-blue-100 text-blue-700': order.status.toLowerCase() === 'dikemas',
+                                    'bg-purple-100 text-purple-700': ['dikirim','pengiriman'].includes(order.status.toLowerCase()),
+                                    'bg-green-100 text-green-700': order.status.toLowerCase() === 'selesai',
+                                    'bg-red-100 text-red-700': order.status.toLowerCase() === 'dibatalkan',
+                                    'bg-gray-100 text-gray-600': !['pending','dikemas','dikirim','pengiriman','selesai','dibatalkan'].includes(order.status.toLowerCase())
+                                }"
+                                x-text="order.status.charAt(0).toUpperCase() + order.status.slice(1)">
+                            </span>
+                        </div>
+                        {{-- Customer info --}}
+                        <div class="mb-3">
+                            <p class="font-semibold text-gray-800 text-sm" x-text="order.customer"></p>
+                            <p class="text-xs text-gray-400" x-text="order.phone"></p>
+                        </div>
+                        {{-- Details row --}}
+                        <div class="flex items-center justify-between text-xs mb-3">
+                            <div class="flex gap-2">
+                                <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded font-medium" x-text="order.items_count + ' item(s)'"></span>
+                                <span class="px-2 py-1 rounded-md font-bold lowercase"
+                                    :class="{
+                                        'bg-indigo-100 text-indigo-700': order.payment && order.payment.toLowerCase().includes('transfer'),
+                                        'bg-orange-100 text-orange-700': order.payment && order.payment.toLowerCase() === 'cod',
+                                        'bg-teal-100 text-teal-700': order.payment && order.payment.toLowerCase() === 'ewallet',
+                                        'bg-cyan-100 text-cyan-700': order.payment && order.payment.toLowerCase() === 'qris',
+                                        'bg-blue-100 text-blue-700': !order.payment || !['transfer','cod','ewallet','qris'].some(p => order.payment.toLowerCase().includes(p))
+                                    }"
+                                    x-text="order.payment || '-'">
+                                </span>
+                            </div>
+                            <span class="font-bold text-gray-800" x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(order.total)"></span>
+                        </div>
+                        {{-- Action select --}}
+                        <form method="POST" :action="'/admin/pesanan/' + order.id + '/status'">
+                            @csrf
+                            <select name="status_pesanan" onchange="this.form.submit()"
+                                class="w-full border border-gray-200 rounded-lg text-sm px-3 py-2 focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none cursor-pointer bg-gray-50 font-medium">
+                                <option value="Pending" :selected="order.status.toLowerCase() === 'pending'">Pending</option>
+                                <option value="Dikemas" :selected="order.status.toLowerCase() === 'dikemas'">Dikemas</option>
+                                <option value="Pengiriman" :selected="['dikirim','pengiriman'].includes(order.status.toLowerCase())">Pengiriman</option>
+                                <option value="Selesai" :selected="order.status.toLowerCase() === 'selesai'">Selesai</option>
+                                <option value="Dibatalkan" :selected="order.status.toLowerCase() === 'dibatalkan'">Dibatalkan</option>
+                            </select>
+                        </form>
+                    </div>
+                </template>
+                <div x-show="filteredOrders.length === 0" class="bg-white rounded-xl border border-gray-100 shadow-sm p-10 text-center text-gray-400">
+                    <svg class="w-10 h-10 mx-auto mb-2 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <p class="text-sm">Tidak ada pesanan ditemukan</p>
+                </div>
+            </div>
+
         </div>
 
-        <div x-show="page === 'pengaturan'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="p-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Pengaturan</h1>
-            <p class="text-gray-500 mb-6">Konfigurasi sistem dan akun</p>
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center text-gray-400">
-                <svg class="h-14 w-14 mx-auto mb-4 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                <p class="font-medium">Halaman Pengaturan</p>
-                <p class="text-sm mt-1">Konten akan ditampilkan di sini</p>
+        <div x-show="page === 'pengaturan'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="p-4 sm:p-8"
+            x-data="{ editing: false }">
+
+            {{-- Header --}}
+            <div class="mb-6">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Pengaturan</h1>
+                <p class="text-gray-500 text-sm mt-1">Kelola katalog produk, pesanan, dan informasi toko untuk customer</p>
+            </div>
+
+            {{-- Informasi Toko Card --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
+
+                {{-- Card Header --}}
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-[#a855f7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-bold text-gray-800">Informasi Toko</h2>
+                    </div>
+                    <button @click="editing = !editing" class="flex items-center gap-1.5 text-sm font-medium text-[#a855f7] hover:text-purple-700 border border-purple-200 hover:border-purple-400 px-3 py-1.5 rounded-lg transition">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        <span x-text="editing ? 'Batal' : 'Edit'"></span>
+                    </button>
+                </div>
+
+                {{-- ===== VIEW MODE ===== --}}
+                <div x-show="!editing" class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+                    <div>
+                        <div class="flex items-center gap-2 text-gray-400 mb-1">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            <span class="text-xs">Nama Toko</span>
+                        </div>
+                        <p class="text-gray-900 font-semibold">{{ $settings['nama_toko'] ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 text-gray-400 mb-1">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                            <span class="text-xs">Telepon</span>
+                        </div>
+                        <p class="text-gray-900 font-semibold">{{ $settings['telepon'] ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 text-gray-400 mb-1">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span class="text-xs">Alamat</span>
+                        </div>
+                        <p class="text-[#a855f7] font-semibold">{{ $settings['alamat'] ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 text-gray-400 mb-1">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <span class="text-xs">Email</span>
+                        </div>
+                        <p class="text-gray-900 font-semibold">{{ $settings['email'] ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 text-gray-400 mb-1">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            <span class="text-xs">Deskripsi</span>
+                        </div>
+                        <p class="text-[#a855f7] font-semibold leading-relaxed">{{ $settings['deskripsi'] ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 text-gray-400 mb-1">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            <span class="text-xs">WhatsApp</span>
+                        </div>
+                        <p class="text-gray-900 font-semibold">{{ $settings['whatsapp'] ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 text-gray-400 mb-1">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/></svg>
+                            <span class="text-xs">Instagram</span>
+                        </div>
+                        <p class="text-gray-900 font-semibold">{{ $settings['instagram'] ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 text-gray-400 mb-1">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="text-xs">Jam Operasional</span>
+                        </div>
+                        <p class="text-gray-900 font-semibold text-sm">Senin–Jumat: {{ $settings['jam_senin_jumat'] ?? '-' }}</p>
+                        <p class="text-gray-900 font-semibold text-sm">Sabtu–Minggu: {{ $settings['jam_sabtu_minggu'] ?? '-' }}</p>
+                    </div>
+                </div>
+
+                {{-- ===== EDIT MODE ===== --}}
+                <div x-show="editing" x-cloak>
+                    <form method="POST" action="/admin/pengaturan" class="space-y-5">
+                        @csrf
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Nama Toko</label>
+                                <input type="text" name="nama_toko" value="{{ $settings['nama_toko'] ?? '' }}" required
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Telepon</label>
+                                <input type="text" name="telepon" value="{{ $settings['telepon'] ?? '' }}" required
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Alamat</label>
+                                <input type="text" name="alamat" value="{{ $settings['alamat'] ?? '' }}" required
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Email</label>
+                                <input type="email" name="email" value="{{ $settings['email'] ?? '' }}" required
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">WhatsApp <span class="text-gray-400 font-normal">(tanpa +)</span></label>
+                                <input type="text" name="whatsapp" value="{{ $settings['whatsapp'] ?? '' }}" required
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Instagram</label>
+                                <input type="text" name="instagram" value="{{ $settings['instagram'] ?? '' }}"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Link Google Maps</label>
+                                <input type="text" name="maps_url" value="{{ $settings['maps_url'] ?? '' }}"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Jam Operasional Senin–Jumat</label>
+                                <input type="text" name="jam_senin_jumat" value="{{ $settings['jam_senin_jumat'] ?? '' }}" placeholder="09:00 - 21:00"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Jam Operasional Sabtu–Minggu</label>
+                                <input type="text" name="jam_sabtu_minggu" value="{{ $settings['jam_sabtu_minggu'] ?? '' }}" placeholder="10:00 - 22:00"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Deskripsi Toko</label>
+                                <textarea name="deskripsi" rows="3"
+                                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition resize-none">{{ $settings['deskripsi'] ?? '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 pt-2">
+                            <button type="button" @click="editing = false"
+                                class="flex-1 sm:flex-none px-6 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50 transition">
+                                Batal
+                            </button>
+                            <button type="submit"
+                                class="flex-1 sm:flex-none px-6 py-2.5 bg-gradient-to-r from-[#a855f7] to-[#3b82f6] text-white text-sm font-semibold rounded-xl hover:opacity-90 transition shadow-sm">
+                                Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 

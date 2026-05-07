@@ -40,16 +40,29 @@
             </a>
         </div>
         <div class="flex items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-[#6b21a8] text-white flex items-center justify-center font-bold text-lg">E</div>
-                <div class="leading-tight">
-                    <p class="font-semibold text-sm text-gray-800">evindajayanti5</p>
-                    <p class="text-xs text-gray-500">Customer</p>
+            @auth
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#6b21a8] text-white flex items-center justify-center font-bold text-lg uppercase">
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+                    <div class="leading-tight">
+                        <p class="font-semibold text-sm text-gray-800">{{ Auth::user()->name }}</p>
+                        <p class="text-xs text-gray-500">{{ ucfirst(Auth::user()->role) }}</p>
+                    </div>
                 </div>
-            </div>
-            <a href="/login" class="text-red-500 hover:text-red-700 transition ml-2" title="Keluar">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-            </a>
+                
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="text-red-500 hover:text-red-700 transition ml-2" title="Keluar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
+                </form>
+            @else
+                <a href="/login" class="bg-[#a855f7] hover:bg-[#9333ea] text-white px-4 py-2 rounded-lg font-medium transition shadow-sm">Masuk</a>
+                <a href="/register" class="bg-white border border-[#a855f7] text-[#a855f7] hover:bg-purple-50 px-4 py-2 rounded-lg font-medium transition">Daftar</a>
+            @endauth
         </div>
     </nav>
 

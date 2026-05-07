@@ -56,223 +56,116 @@
 
         <!-- User Profile Area -->
         <div class="flex items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-[#6b21a8] text-white flex items-center justify-center font-bold text-lg">
-                    E
+            @auth
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#6b21a8] text-white flex items-center justify-center font-bold text-lg uppercase">
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+                    <div class="leading-tight">
+                        <p class="font-semibold text-sm text-gray-800">{{ Auth::user()->name }}</p>
+                        <p class="text-xs text-gray-500">{{ ucfirst(Auth::user()->role) }}</p>
+                    </div>
                 </div>
-                <div class="leading-tight">
-                    <p class="font-semibold text-sm text-gray-800">evindajayanti5</p>
-                    <p class="text-xs text-gray-500">Customer</p>
-                </div>
-            </div>
-            
-            <a href="/login" class="text-red-500 hover:text-red-700 transition ml-2" title="Keluar">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-            </a>
+                
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="text-red-500 hover:text-red-700 transition ml-2" title="Keluar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
+                </form>
+            @else
+                <a href="/login" class="bg-[#a855f7] hover:bg-[#9333ea] text-white px-4 py-2 rounded-lg font-medium transition shadow-sm">Masuk</a>
+                <a href="/register" class="bg-white border border-[#a855f7] text-[#a855f7] hover:bg-purple-50 px-4 py-2 rounded-lg font-medium transition">Daftar</a>
+            @endauth
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-6 py-8" x-data="{ showVariantModal: false, selectedSize: null, selectedColor: null, selectedProduct: '', selectedPrice: 0, actionType: '' }">
+    <main class="max-w-7xl mx-auto px-6 py-8" x-data="{ showVariantModal: false, selectedSize: null, selectedColor: null, selectedProduct: '', selectedPrice: 0, selectedId: null, actionType: '' }">
         
         <!-- Header Section -->
         <div class="mb-8">
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Katalog Produk</h1>
-            <p class="text-gray-500">9 produk tersedia</p>
+            <p class="text-gray-500">{{ $products->count() }} produk tersedia</p>
         </div>
 
         <!-- Search & Filter Bar -->
-        <div class="flex flex-col sm:flex-row gap-4 mb-8">
+        <form action="/katalog" method="GET" class="flex flex-col sm:flex-row gap-4 mb-8">
             <div class="relative flex-1">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <input type="text" class="block w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] transition" placeholder="Cari produk atau brand...">
+                <input type="text" name="search" value="{{ request('search') }}" class="block w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] transition" placeholder="Cari produk atau brand...">
             </div>
             
-            <button class="bg-[#a855f7] hover:bg-[#9333ea] text-white px-8 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors">
+            <button type="submit" class="bg-[#a855f7] hover:bg-[#9333ea] text-white px-8 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                Filter
+                Cari
             </button>
-        </div>
+        </form>
 
         <!-- Product Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            
-            <!-- Product Card 1 -->
+            @forelse($products as $product)
+            <!-- Product Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group flex flex-col h-full cursor-pointer">
                 <!-- Image Box -->
-                <div class="h-64 bg-gradient-to-br from-[#e0e7ff] to-[#f3e8ff] flex items-center justify-center relative">
-                    <img src="https://cdn-icons-png.flaticon.com/512/892/892454.png" alt="Icon" class="w-12 h-12 opacity-80 mix-blend-multiply group-hover:scale-110 transition-transform">
-                    <span class="absolute bottom-4 text-xs font-medium text-gray-500">outer</span>
+                <div class="h-64 {{ $product->gambar ? '' : 'bg-gradient-to-br from-[#e0e7ff] to-[#f3e8ff]' }} flex items-center justify-center relative overflow-hidden">
+                    @if($product->gambar)
+                        <img src="{{ asset('storage/'.$product->gambar) }}" alt="{{ $product->nama }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    @else
+                        <img src="https://cdn-icons-png.flaticon.com/512/892/892454.png" alt="Icon" class="w-12 h-12 opacity-80 mix-blend-multiply group-hover:scale-110 transition-transform">
+                    @endif
+                    <span class="absolute bottom-4 left-4 bg-black/50 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-md">{{ $product->kategori }}</span>
                 </div>
                 <!-- Content Box -->
                 <div class="p-5 flex-1 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start gap-2 mb-1">
-                            <h3 class="font-semibold text-gray-900 leading-tight">Vintage Denim Jacket</h3>
-                            <span class="bg-[#fef08a] text-[#854d0e] text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">second</span>
+                            <h3 class="font-semibold text-gray-900 leading-tight">{{ $product->nama }}</h3>
+                            <span class="{{ strtolower($product->kondisi) == 'baru' ? 'bg-[#bbf7d0] text-[#166534]' : 'bg-[#fef08a] text-[#854d0e]' }} text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">{{ $product->kondisi }}</span>
                         </div>
-                        <p class="text-xs text-gray-500 mb-2">Levi's</p>
+                        <p class="text-xs text-gray-500 mb-2">{{ $product->brand }}</p>
                         <div class="flex items-center gap-2 text-xs text-gray-600 mb-4">
-                            <span>Size: M</span>
+                            <span>Size: {{ $product->ukuran }}</span>
                             <span class="text-gray-300">•</span>
-                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-600"></span> Blue</span>
+                            <span class="flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full border border-gray-200" style="background-color: {{ $product->warna }};"></span> 
+                                {{ $product->warna }}
+                            </span>
                         </div>
                     </div>
                     
                     <div>
                         <div class="flex justify-between items-end mb-4">
-                            <span class="text-xl font-bold text-[#a855f7]">Rp 250.000</span>
-                            <span class="text-xs text-gray-500 mb-1">Stok: 3</span>
+                            <span class="text-xl font-bold text-[#a855f7]">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+                            <span class="text-xs text-gray-500 mb-1">Stok: {{ $product->stok }}</span>
                         </div>
                         
                         <div class="flex gap-2">
-                           <button @click="showVariantModal = true; selectedSize = null; selectedColor = null; selectedProduct = 'Vintage Denim Jacket'; selectedPrice = 250000; actionType = 'cart'" class="flex-1 bg-gradient-to-r from-[#a855f7] to-[#3b82f6] text-white py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:opacity-90 transition shadow-sm" title="Tambah ke Keranjang">
+                           <button @click="showVariantModal = true; selectedSize = '{{ $product->ukuran }}'; selectedColor = '{{ $product->warna }}'; selectedProduct = '{{ addslashes($product->nama) }}'; selectedPrice = {{ $product->harga }}; selectedId = {{ $product->id }}; actionType = 'cart'" class="flex-1 bg-gradient-to-r from-[#a855f7] to-[#3b82f6] text-white py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:opacity-90 transition shadow-sm" title="Tambah ke Keranjang" {{ $product->stok <= 0 ? 'disabled' : '' }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
                            </button>
-                           <button @click="showVariantModal = true; selectedSize = null; selectedColor = null; selectedProduct = 'Vintage Denim Jacket'; selectedPrice = 250000; actionType = 'buy'" class="flex-[3] flex items-center justify-center border border-[#a855f7] text-[#a855f7] py-2.5 rounded-lg text-sm font-medium hover:bg-purple-50 transition block text-center w-full">
-                                Beli Langsung
+                           <button @click="showVariantModal = true; selectedSize = '{{ $product->ukuran }}'; selectedColor = '{{ $product->warna }}'; selectedProduct = '{{ addslashes($product->nama) }}'; selectedPrice = {{ $product->harga }}; selectedId = {{ $product->id }}; actionType = 'buy'" class="flex-[3] flex items-center justify-center border border-[#a855f7] text-[#a855f7] py-2.5 rounded-lg text-sm font-medium hover:bg-purple-50 transition block text-center w-full" {{ $product->stok <= 0 ? 'disabled' : '' }}>
+                                {{ $product->stok <= 0 ? 'Habis' : 'Beli Langsung' }}
                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Product Card 2 -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group flex flex-col h-full cursor-pointer">
-                <!-- Image Box -->
-                <div class="h-64 bg-gradient-to-br from-[#f3e8ff] to-[#e0e7ff] flex items-center justify-center relative">
-                    <img src="https://cdn-icons-png.flaticon.com/512/892/892454.png" alt="Icon" class="w-12 h-12 opacity-80 mix-blend-multiply group-hover:scale-110 transition-transform">
-                    <span class="absolute bottom-4 text-xs font-medium text-gray-500">hoodie</span>
-                </div>
-                <!-- Content Box -->
-                <div class="p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start gap-2 mb-1">
-                            <h3 class="font-semibold text-gray-900 leading-tight">Oversized Hoodie</h3>
-                            <span class="bg-[#bbf7d0] text-[#166534] text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">new</span>
-                        </div>
-                        <p class="text-xs text-gray-500 mb-2">Uniqlo</p>
-                        <div class="flex items-center gap-2 text-xs text-gray-600 mb-4">
-                            <span>Size: L</span>
-                            <span class="text-gray-300">•</span>
-                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-black"></span> Black</span>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <div class="flex justify-between items-end mb-4">
-                            <span class="text-xl font-bold text-[#a855f7]">Rp 350.000</span>
-                            <span class="text-xs text-gray-500 mb-1">Stok: 8</span>
-                        </div>
-                        
-                        <div class="flex gap-2">
-                           <button @click="showVariantModal = true; selectedSize = null; selectedColor = null; selectedProduct = 'Oversized Hoodie'; selectedPrice = 350000; actionType = 'cart'" class="flex-1 bg-gradient-to-r from-[#a855f7] to-[#3b82f6] text-white py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:opacity-90 transition shadow-sm" title="Tambah ke Keranjang">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                           </button>
-                           <button @click="showVariantModal = true; selectedSize = null; selectedColor = null; selectedProduct = 'Oversized Hoodie'; selectedPrice = 350000; actionType = 'buy'" class="flex-[3] flex items-center justify-center border border-[#a855f7] text-[#a855f7] py-2.5 rounded-lg text-sm font-medium hover:bg-purple-50 transition block text-center w-full">
-                                Beli Langsung
-                           </button>
-                        </div>
-                    </div>
-                </div>
+            @empty
+            <div class="col-span-full py-12 text-center text-gray-500">
+                Tidak ada produk yang ditemukan.
             </div>
-
-            <!-- Product Card 3 -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group flex flex-col h-full cursor-pointer">
-                <!-- Image Box -->
-                <div class="h-64 bg-gradient-to-br from-[#e0e7ff] to-[#f3e8ff] flex items-center justify-center relative">
-                    <img src="https://cdn-icons-png.flaticon.com/512/892/892454.png" alt="Icon" class="w-12 h-12 opacity-80 mix-blend-multiply group-hover:scale-110 transition-transform">
-                    <span class="absolute bottom-4 text-xs font-medium text-gray-500">celana</span>
-                </div>
-                <!-- Content Box -->
-                <div class="p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start gap-2 mb-1">
-                            <h3 class="font-semibold text-gray-900 leading-tight">Cargo Pants</h3>
-                            <span class="bg-[#fef08a] text-[#854d0e] text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">second</span>
-                        </div>
-                        <p class="text-xs text-gray-500 mb-2">Dickies</p>
-                        <div class="flex items-center gap-2 text-xs text-gray-600 mb-4">
-                            <span>Size: L</span>
-                            <span class="text-gray-300">•</span>
-                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#f5f5dc] border border-gray-200"></span> Khaki</span>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <div class="flex justify-between items-end mb-4">
-                            <span class="text-xl font-bold text-[#a855f7]">Rp 200.000</span>
-                            <span class="text-xs text-gray-500 mb-1">Stok: 4</span>
-                        </div>
-                        
-                        <div class="flex gap-2">
-                           <button @click="showVariantModal = true; selectedSize = null; selectedColor = null; selectedProduct = 'Cargo Pants'; selectedPrice = 200000; actionType = 'cart'" class="flex-1 bg-gradient-to-r from-[#a855f7] to-[#3b82f6] text-white py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:opacity-90 transition shadow-sm" title="Tambah ke Keranjang">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                           </button>
-                           <button @click="showVariantModal = true; selectedSize = null; selectedColor = null; selectedProduct = 'Cargo Pants'; selectedPrice = 200000; actionType = 'buy'" class="flex-[3] flex items-center justify-center border border-[#a855f7] text-[#a855f7] py-2.5 rounded-lg text-sm font-medium hover:bg-purple-50 transition block text-center w-full">
-                                Beli Langsung
-                           </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product Card 4 -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group flex flex-col h-full cursor-pointer">
-                <!-- Image Box -->
-                <div class="h-64 bg-gradient-to-br from-[#f3e8ff] to-[#e0e7ff] flex items-center justify-center relative">
-                    <img src="https://cdn-icons-png.flaticon.com/512/892/892454.png" alt="Icon" class="w-12 h-12 opacity-80 mix-blend-multiply group-hover:scale-110 transition-transform">
-                    <span class="absolute bottom-4 text-xs font-medium text-gray-500">dress</span>
-                </div>
-                <!-- Content Box -->
-                <div class="p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start gap-2 mb-1">
-                            <h3 class="font-semibold text-gray-900 leading-tight">Floral Dress</h3>
-                            <span class="bg-[#bbf7d0] text-[#166534] text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">new</span>
-                        </div>
-                        <p class="text-xs text-gray-500 mb-2">Zara</p>
-                        <div class="flex items-center gap-2 text-xs text-gray-600 mb-4">
-                            <span>Size: M</span>
-                            <span class="text-gray-300">•</span>
-                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-pink-300"></span> Pink</span>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <div class="flex justify-between items-end mb-4">
-                            <span class="text-xl font-bold text-[#a855f7]">Rp 300.000</span>
-                            <span class="text-xs text-gray-500 mb-1">Stok: 2</span>
-                        </div>
-                        
-                        <div class="flex gap-2">
-                           <button @click="showVariantModal = true; selectedSize = null; selectedColor = null; selectedProduct = 'Floral Dress'; selectedPrice = 300000; actionType = 'cart'" class="flex-1 bg-gradient-to-r from-[#a855f7] to-[#3b82f6] text-white py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:opacity-90 transition shadow-sm" title="Tambah ke Keranjang">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                           </button>
-                           <button @click="showVariantModal = true; selectedSize = null; selectedColor = null; selectedProduct = 'Floral Dress'; selectedPrice = 300000; actionType = 'buy'" class="flex-[3] flex items-center justify-center border border-[#a855f7] text-[#a855f7] py-2.5 rounded-lg text-sm font-medium hover:bg-purple-50 transition block text-center w-full">
-                                Beli Langsung
-                           </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            @endforelse
         </div>
 
         <!-- Variant Modal -->
@@ -290,12 +183,7 @@
                 <div class="mb-5">
                     <h3 class="text-sm font-medium text-gray-700 mb-3">Ukuran</h3>
                     <div class="flex flex-wrap gap-2">
-                        <template x-for="size in ['M', 'L', 'XL', 'XXL']" :key="size">
-                            <button type="button" @click="selectedSize = size"
-                                    :class="selectedSize === size ? 'bg-[#a855f7] text-white border-[#a855f7]' : 'bg-white text-gray-700 border-gray-200 hover:border-[#a855f7]'"
-                                    class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors min-w-[3rem]"
-                                    x-text="size"></button>
-                        </template>
+                        <button type="button" class="bg-[#a855f7] text-white border-[#a855f7] px-4 py-2 rounded-lg border font-medium text-sm transition-colors min-w-[3rem]" x-text="selectedSize"></button>
                     </div>
                 </div>
 
@@ -303,12 +191,7 @@
                 <div class="mb-8">
                     <h3 class="text-sm font-medium text-gray-700 mb-3">Warna</h3>
                     <div class="flex flex-wrap gap-2">
-                        <template x-for="color in ['Hitam', 'Biru', 'Hijau', 'Putih']" :key="color">
-                            <button type="button" @click="selectedColor = color"
-                                    :class="selectedColor === color ? 'bg-[#a855f7] text-white border-[#a855f7]' : 'bg-white text-gray-700 border-gray-200 hover:border-[#a855f7]'"
-                                    class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors min-w-[4rem]"
-                                    x-text="color"></button>
-                        </template>
+                        <button type="button" class="bg-[#a855f7] text-white border-[#a855f7] px-4 py-2 rounded-lg border font-medium text-sm transition-colors min-w-[4rem]" x-text="selectedColor"></button>
                     </div>
                 </div>
 
@@ -317,7 +200,7 @@
                     <!-- Tombol Lanjut, non-aktif jika pilihan belum lengkap -->
                     <button @click="
                             const item = {
-                                id: Date.now(),
+                                id: selectedId,
                                 name: selectedProduct,
                                 price: selectedPrice,
                                 size: selectedSize,

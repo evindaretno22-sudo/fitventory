@@ -12,8 +12,18 @@ Route::get('/', function () {
 });
 
 // Pelanggan Routes
-Route::get('/katalog', function () {
-    return view('pelanggan.katalog');
+Route::get('/katalog', function (\Illuminate\Http\Request $request) {
+    $query = \App\Models\Produk::with('stock');
+    if ($request->has('search')) {
+        $search = $request->search;
+        $query->where('nama', 'LIKE', "%{$search}%")
+              ->orWhere('brand', 'LIKE', "%{$search}%");
+    }
+    $products = $query->get()->map(function($p) {
+        $p->stok = $p->stock ? $p->stock->kuantitas : 0;
+        return $p;
+    });
+    return view('pelanggan.katalog', compact('products'));
 });
 
 Route::get('/info-toko', function () {
@@ -25,16 +35,18 @@ Route::get('/keranjang', function () {
     return view('pelanggan.keranjang');
 });
 
-Route::get('/checkout', function () {
-    return view('pelanggan.checkout');
-});
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout', function () {
+        return view('pelanggan.checkout');
+    });
 
-Route::get('/pembayaran', function () {
-    return view('pelanggan.pembayaran');
-});
+    Route::get('/pembayaran', function () {
+        return view('pelanggan.pembayaran');
+    });
 
-Route::get('/pesanan', [\App\Http\Controllers\OrderController::class, 'myOrders']);
-Route::post('/order', [\App\Http\Controllers\OrderController::class, 'store']);
+    Route::get('/pesanan', [\App\Http\Controllers\OrderController::class, 'myOrders']);
+    Route::post('/order', [\App\Http\Controllers\OrderController::class, 'store']);
+});
 
 // Auth Routes
 Route::get('/login', function () {

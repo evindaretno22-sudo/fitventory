@@ -45,14 +45,13 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'required|in:admin,pelanggan',
         ]);
 
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
-        $user->role = $request->role; // dynamically assigned based on form
+        $user->role = 'customer'; // dynamically assigned based on form
         $user->saveOrFail();
 
         Auth::login($user);

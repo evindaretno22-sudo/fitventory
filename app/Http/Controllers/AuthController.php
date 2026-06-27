@@ -61,4 +61,44 @@ class AuthController extends Controller
         }
         return redirect('/katalog');
     }
+
+    public function redirectToProvider($provider)
+    {
+        return \Laravel\Socialite\Facades\Socialite::driver($provider)->redirect();
+    }
+
+    public function handleProviderCallback($provider)
+    {
+        try {
+            $socialUser = \Laravel\Socialite\Facades\Socialite::driver($provider)->user();
+        } catch (\Exception $e) {
+            return redirect('/login')->withErrors(['email' => 'Gagal login menggunakan ' . ucfirst($provider)]);
+        }
+
+        $user = User::where('email', $socialUser->getEmail())->first();
+
+        if ($user) {
+            if (!$user->provider) {
+                $user->provider = $provider;
+                $user->provider_id = $socialUser->getId();
+                $user->save();
+            }
+            Auth::login($user);
+        } else {
+            $user = new User();
+            $user->name = $socialUser->getName() ?? $socialUser->getNickname() ?? 'User';
+            $user->email = $socialUser->getEmail();
+            $user->provider = $provider;
+            $user->provider_id = $socialUser->getId();
+            $user->role = 'pelanggan';
+            $user->save();
+
+            Auth::login($user);
+        }
+
+        if ($user->role === 'admin') {
+            return redirect('/admin/dashboard');
+        }
+        return redirect('/katalog');
+    }
 }
